@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
 
 const recentRequests = new Map<string, number[]>();
-const recentWelcomeEmails = new Map<string, number>();
 const WINDOW_MS = 10 * 60 * 1000;
 const MAX_REQUESTS = 5;
-const WELCOME_COOLDOWN_MS = 60 * 1000;
 
 function isValidEmail(email: string) {
   return email.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -93,49 +91,6 @@ export async function POST(request: Request) {
     });
 
     if (brevoResponse.ok) {
-      const welcomeKey = process.env.BREVO_TRANSACTIONAL_API_KEY;
-      const senderEmail = process.env.BREVO_SENDER_EMAIL;
-      const senderName = process.env.BREVO_SENDER_NAME || "Chronicle";
-
-      if (welcomeKey && senderEmail) {
-        const lastWelcomeAttempt = recentWelcomeEmails.get(email) || 0;
-        if (Date.now() - lastWelcomeAttempt >= WELCOME_COOLDOWN_MS) {
-          recentWelcomeEmails.set(email, Date.now());
-          try {
-            const welcomeResponse = await fetch("https://api.brevo.com/v3/smtp/email", {
-              method: "POST",
-              headers: {
-                "api-key": welcomeKey,
-                "Content-Type": "application/json",
-                Accept: "application/json",
-              },
-              body: JSON.stringify({
-                sender: { name: senderName, email: senderEmail },
-                to: [{ email }],
-                subject: "You’re on the Chronicle early-access list",
-                textContent: "Hi,\n\nThanks for signing up for Chronicle early access. You’re on our list. We’ll send a note when there’s something worth sharing, including when Chronicle is ready to explore.\n\nNo need to reply.\n\n— The Chronicle team",
-              }),
-              cache: "no-store",
-              signal: AbortSignal.timeout(8000),
-            });
-
-            if (welcomeResponse.ok) {
-              return NextResponse.json({
-                kind: "success",
-                message: "You’re on the list. Check your inbox and Spam folder for Chronicle emails; if one lands in Spam, mark it as Not spam.",
-              });
-            }
-            console.error("Brevo welcome email failed", { status: welcomeResponse.status });
-          } catch {
-            console.error("Brevo welcome email request failed");
-          }
-        }
-        return NextResponse.json({
-          kind: "success",
-          message: "You’re on the list. We couldn’t send a welcome email just now, so please check your inbox and Spam folder for future Chronicle emails. If one lands in Spam, mark it as Not spam.",
-        });
-      }
-
       return NextResponse.json({
         kind: "success",
         message: "You’re on the list. Check your inbox and Spam folder for Chronicle emails; if one lands in Spam, mark it as Not spam.",
