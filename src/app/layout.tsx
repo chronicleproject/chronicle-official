@@ -6,7 +6,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Chronicle — A Home for Builders",
   description:
-    "Chronicle is a home for the projects shaping what comes next. Follow the progress, meet the people building, and see how ideas become something real.",
+    "Chronicle gives projects in progress a home for their purpose, people, evolving history, and discussion—so everyone can follow how the work takes shape.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
