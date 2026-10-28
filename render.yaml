@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: chronicle-signup-api
+    runtime: node
+    plan: free
+    region: singapore
+    rootDir: signup-api
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /healthz
+    autoDeployTrigger: commit
+    buildFilter:
+      paths:
+        - signup-api/**
+        - render.yaml
+    envVars:
+      - key: BREVO_API_KEY
+        sync: false
+      - key: BREVO_EARLY_ACCESS_LIST_ID
+        sync: false
+      - key: ALLOWED_ORIGINS
+        value: https://chronicleproject.dpdns.org,https://chronicleproject.github.io,http://localhost:3000

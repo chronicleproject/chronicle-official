@@ -101,7 +101,7 @@ export default function Home() {
         <div className="cover-intro">
           <div className="intro-rule" />
           <p>Projects are more than what they ship. Chronicle is a place to document the work, share the thinking, and follow what comes next.</p>
-          <div id="updates"><SignupForm /></div>
+          <div id="updates"><SignupForm apiUrl={process.env.NEXT_PUBLIC_SIGNUP_API_URL ?? ""} /></div>
         </div>
       </section>
 

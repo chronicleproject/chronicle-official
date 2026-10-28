@@ -23,7 +23,10 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run build
+      - name: Build Next.js static site
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SIGNUP_API_URL: ${{ vars.CHRONICLE_SIGNUP_API_URL }}
       - name: Add custom domain to Pages artifact
         run: cp CNAME out/CNAME
       - uses: actions/upload-pages-artifact@v3

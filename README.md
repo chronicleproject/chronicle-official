@@ -11,7 +11,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-The static Pages deployment cannot run a Next.js API route. The signup form remains visible but disabled while a backend is being chosen. `BREVO_SETUP.md` contains notes for the previous Brevo integration and will need updating if that backend is restored.
+GitHub Pages hosts the static page, while the signup API runs as a separate Render web service and writes signups to Brevo. See [SIGNUP_BACKEND.md](./SIGNUP_BACKEND.md) to deploy and connect the API.
 
 ## Checks
 
@@ -30,4 +30,6 @@ GitHub Actions builds the app with `next build` and publishes the generated `out
 - `src/app/page.tsx` — landing page and product showcase
 - `src/app/SignupForm.tsx` — accessible signup UI and feedback
 - `.github/workflows/pages.yml` — GitHub Pages build and deployment
+- `signup-api/server.mjs` — Render API and Brevo contact-list integration
+- `render.yaml` — Render web-service Blueprint
 - `public/chronicle-*.png` — product screenshots used in the showcase

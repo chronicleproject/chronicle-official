@@ -1,6 +1,6 @@
-# Brevo early-access signup (not currently connected)
+# Brevo early-access signup
 
-The current GitHub Pages site is static and the signup form is paused. This document describes the previous server-side integration as reference for a future backend; do not expect signup submissions to be collected until that backend is restored on a host that supports server code.
+The static GitHub Pages site sends signups to the separate Render service in `signup-api/`. That service adds each consenting email address to the configured Brevo contact list for future campaigns. It does not send a transactional welcome email.
 
 The signup endpoint adds an email address to one Brevo contact list for future Email campaigns. It does not send a transactional welcome email. After signup, the page confirms enrollment and reminds people to check Spam for Chronicle campaigns and mark them as Not spam if needed.
 
@@ -13,8 +13,8 @@ BREVO_EARLY_ACCESS_LIST_ID=your_numeric_contact_list_id
 
 Create a private API key in Brevo under **SMTP & API → API keys** with the Contacts permissions needed for the signup endpoint, and create or select a dedicated **Early access** contact list under **CRM → Contacts → Lists**. The list ID is shown in the list details or returned by Brevo's `GET /v3/contacts/lists` endpoint.
 
-Keep the API key in server-side environment variables; never use a `NEXT_PUBLIC_` name. Restart the local Next.js server after updating `.env.local`. Send announcements from the Brevo **Email campaigns** area to the Early access list.
+Set these values in Render's service environment, never in a `NEXT_PUBLIC_` variable. Send announcements from the Brevo **Email campaigns** area to the Early access list.
 
-On signup, the route checks whether the address is already in the early-access list and adds it if not. Repeated signups return an already-enrolled message. The form can be exercised without Brevo credentials; it will not claim a signup succeeded when contact registration is unavailable.
+On signup, the API checks whether the address is already in the early-access list and adds it if not. Repeated signups return an already-enrolled message. If Brevo isn't configured, the API returns an unavailable message rather than claiming signup succeeded.
 
 The endpoint uses Brevo's `GET /v3/contacts/{identifier}` operation to check list membership and `POST /v3/contacts` with `updateEnabled: true` to add an existing Brevo contact to the list without creating a duplicate. See the [Brevo get contact API](https://developers.brevo.com/reference/get-contact-info) and [create contact API](https://developers.brevo.com/reference/create-contact).
