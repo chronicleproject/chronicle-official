@@ -1,6 +1,6 @@
 # Chronicle Official Website
 
-The Coming Soon landing page for Chronicle. It includes a scrollable product-screen showcase and an early-access signup form backed by Brevo.
+The Coming Soon landing page for Chronicle, built with Next.js and exported as static files for GitHub Pages. The early-access form is displayed but paused until a signup backend is selected.
 
 ## Run locally
 
@@ -11,20 +11,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-For local signup integration, create `.env.local` with the server-only values below:
-
-```text
-BREVO_API_KEY=your_private_brevo_api_key
-BREVO_EARLY_ACCESS_LIST_ID=your_brevo_contact_list_id
-```
-
-The API key must have the Contacts permissions required by the signup endpoint. Never use a `NEXT_PUBLIC_` prefix for this key and never commit `.env.local`. See [BREVO_SETUP.md](./BREVO_SETUP.md) for how to find the list ID and configure the key.
-
-## Signup and campaigns
-
-`POST /api/early-access` validates the email and consent, applies a basic rate limit and honeypot check, detects existing list members, then adds new signups to the configured Brevo list. It does **not** send a welcome email. Send announcements to that list from Brevo’s **Email campaigns** area. Signup confirmations tell people to check Spam and mark Chronicle emails as **Not spam** if needed.
-
-The rate limit is held in process memory, so it is best-effort and can reset when the server restarts or scales to multiple instances.
+The static Pages deployment cannot run a Next.js API route. The signup form remains visible but disabled while a backend is being chosen. `BREVO_SETUP.md` contains notes for the previous Brevo integration and will need updating if that backend is restored.
 
 ## Checks
 
@@ -34,19 +21,13 @@ npx tsc --noEmit
 npm run build
 ```
 
-## Hosting and repository visibility
+## Hosting
 
-This is a full-stack Next.js app: the signup form calls the server route at `/api/early-access`. It needs a host that can run that route; a static export alone will not provide signup functionality.
-
-- **GitHub Pages:** GitHub Pages serves static files and cannot run this Next.js API route. On GitHub Free, the Pages source repository must be public; GitHub Pro, Team, and Enterprise plans also allow private source repositories. Making this repository public by itself will not make the current app work on Pages. See [GitHub Pages availability and limitations](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages).
-- **Cloudflare:** The full-stack app, including `/api/early-access`, runs on Cloudflare Workers through Vinext. This small landing page does not need a persistent response cache or a separate Response Store Worker. In Workers Builds, set the root directory to `apps/nextjs/chronicle-official`, the build command to `npm run build:vinext`, the deploy command to `npm run deploy:vinext`, and the preview command to `npx wrangler preview`. Add `BREVO_API_KEY` as a Worker secret and `BREVO_EARLY_ACCESS_LIST_ID` as a Worker runtime variable in Cloudflare; local `.env.local` values are not deployed. Cloudflare Pages custom subdomains can use a CNAME from an external DNS provider after the hostname is added to the Pages project.
-- **Vercel:** Vercel runs Next.js, including the signup route, directly and supports [custom domains](https://vercel.com/docs/domains/set-up-custom-domain). Add `chronicleproject.dpdns.org` to the project, then copy the exact DNS record Vercel provides into DigitalPlat DNS. Vercel’s free [Hobby plan](https://vercel.com/docs/plans/hobby) is limited to personal, non-commercial use; commercial projects require Pro or Enterprise under its current policy.
-
-[DigitalPlat Domains](https://domain.digitalplat.org/) provides the `dpdns.org` name and DNS controls; it does not host this Next.js application. You can keep the GitHub repository private when using a hosting provider that supports private-repository integration. Repository visibility does not replace keeping API keys out of Git.
+GitHub Actions builds the app with `next build` and publishes the generated `out/` directory to GitHub Pages. In the repository settings, set **Pages → Build and deployment → Source** to **GitHub Actions**. The workflow copies the repository root `CNAME` into the published artifact for `chronicleproject.dpdns.org`. Keep its Cloudflare DNS record DNS-only and pointed at `chronicleproject.github.io`; mail-related DNS records are separate and should be left as configured.
 
 ## Project files
 
 - `src/app/page.tsx` — landing page and product showcase
 - `src/app/SignupForm.tsx` — accessible signup UI and feedback
-- `src/app/api/early-access/route.ts` — server-side Brevo contact-list integration
+- `.github/workflows/pages.yml` — GitHub Pages build and deployment
 - `public/chronicle-*.png` — product screenshots used in the showcase

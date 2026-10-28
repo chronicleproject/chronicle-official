@@ -1,4 +1,6 @@
-# Brevo early-access signup
+# Brevo early-access signup (not currently connected)
+
+The current GitHub Pages site is static and the signup form is paused. This document describes the previous server-side integration as reference for a future backend; do not expect signup submissions to be collected until that backend is restored on a host that supports server code.
 
 The signup endpoint adds an email address to one Brevo contact list for future Email campaigns. It does not send a transactional welcome email. After signup, the page confirms enrollment and reminds people to check Spam for Chronicle campaigns and mark them as Not spam if needed.
 
